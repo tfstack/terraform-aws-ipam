@@ -200,4 +200,52 @@ Inputs and outputs for each submodule are defined in:
 - [`modules/pool/variables.tf`](modules/pool/variables.tf) / [`outputs.tf`](modules/pool/outputs.tf)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_ipam_core"></a> [ipam\_core](#module\_ipam\_core) | ./modules/ipam-core | n/a |
+| <a name="module_pool"></a> [pool](#module\_pool) | ./modules/pool | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_address_family"></a> [address\_family](#input\_address\_family) | Address family applied to all pools. | `string` | `"ipv4"` | no |
+| <a name="input_create"></a> [create](#input\_create) | Whether to create IPAM and pool resources. | `bool` | `true` | no |
+| <a name="input_create_ipam"></a> [create\_ipam](#input\_create\_ipam) | Whether to create a new IPAM instance. When false, provide ipam\_scope\_id. | `bool` | `true` | no |
+| <a name="input_description"></a> [description](#input\_description) | Description of the IPAM instance. | `string` | `null` | no |
+| <a name="input_ipam_scope_id"></a> [ipam\_scope\_id](#input\_ipam\_scope\_id) | Existing IPAM scope ID to attach pools to when create\_ipam is false. | `string` | `null` | no |
+| <a name="input_pools"></a> [pools](#input\_pools) | Nested pool definitions. Max depth 5. | <pre>map(object({<br/>    cidr                              = list(string)<br/>    locale                            = optional(string)<br/>    description                       = optional(string)<br/>    allocation_default_netmask_length = optional(number)<br/>    allocation_min_netmask_length     = optional(number)<br/>    allocation_max_netmask_length     = optional(number)<br/>    allocation_resource_tags          = optional(map(string))<br/>    auto_import                       = optional(bool)<br/>    ram_share_principals              = optional(list(string))<br/>    sub_pools = optional(map(object({<br/>      cidr                              = list(string)<br/>      locale                            = optional(string)<br/>      description                       = optional(string)<br/>      allocation_default_netmask_length = optional(number)<br/>      allocation_min_netmask_length     = optional(number)<br/>      allocation_max_netmask_length     = optional(number)<br/>      allocation_resource_tags          = optional(map(string))<br/>      auto_import                       = optional(bool)<br/>      ram_share_principals              = optional(list(string))<br/>      sub_pools = optional(map(object({<br/>        cidr                              = list(string)<br/>        locale                            = optional(string)<br/>        description                       = optional(string)<br/>        allocation_default_netmask_length = optional(number)<br/>        allocation_min_netmask_length     = optional(number)<br/>        allocation_max_netmask_length     = optional(number)<br/>        allocation_resource_tags          = optional(map(string))<br/>        auto_import                       = optional(bool)<br/>        ram_share_principals              = optional(list(string))<br/>        sub_pools = optional(map(object({<br/>          cidr                              = list(string)<br/>          locale                            = optional(string)<br/>          description                       = optional(string)<br/>          allocation_default_netmask_length = optional(number)<br/>          allocation_min_netmask_length     = optional(number)<br/>          allocation_max_netmask_length     = optional(number)<br/>          allocation_resource_tags          = optional(map(string))<br/>          auto_import                       = optional(bool)<br/>          ram_share_principals              = optional(list(string))<br/>          sub_pools = optional(map(object({<br/>            cidr                              = list(string)<br/>            locale                            = optional(string)<br/>            description                       = optional(string)<br/>            allocation_default_netmask_length = optional(number)<br/>            allocation_min_netmask_length     = optional(number)<br/>            allocation_max_netmask_length     = optional(number)<br/>            allocation_resource_tags          = optional(map(string))<br/>            auto_import                       = optional(bool)<br/>            ram_share_principals              = optional(list(string))<br/>            sub_pools = optional(map(object({<br/>              cidr                              = list(string)<br/>              locale                            = optional(string)<br/>              description                       = optional(string)<br/>              allocation_default_netmask_length = optional(number)<br/>              allocation_min_netmask_length     = optional(number)<br/>              allocation_max_netmask_length     = optional(number)<br/>              allocation_resource_tags          = optional(map(string))<br/>              auto_import                       = optional(bool)<br/>              ram_share_principals              = optional(list(string))<br/>            })))<br/>          })))<br/>        })))<br/>      })))<br/>    })))<br/>  }))</pre> | `{}` | no |
+| <a name="input_scope_type"></a> [scope\_type](#input\_scope\_type) | IPAM scope type to use when creating a new IPAM instance. | `string` | `"private"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to created resources. | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_ipam_arn"></a> [ipam\_arn](#output\_ipam\_arn) | ARN of the created IPAM instance. |
+| <a name="output_ipam_id"></a> [ipam\_id](#output\_ipam\_id) | ID of the created IPAM instance. |
+| <a name="output_pool_ids"></a> [pool\_ids](#output\_pool\_ids) | Map of pool IDs keyed by path. |
+| <a name="output_pools"></a> [pools](#output\_pools) | Map of pool attributes keyed by path. |
+| <a name="output_private_scope_id"></a> [private\_scope\_id](#output\_private\_scope\_id) | Private default scope ID of the created IPAM instance. |
+| <a name="output_ram_share_pool_keys"></a> [ram\_share\_pool\_keys](#output\_ram\_share\_pool\_keys) | Pool keys with RAM shares configured. |
 <!-- END_TF_DOCS -->
