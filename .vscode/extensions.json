@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "hashicorp.terraform",
+    "davidanson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens"
+  ]
+}
