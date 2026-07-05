@@ -1,0 +1,2 @@
+region   = "ap-southeast-6"
+pool_id  = "ipam-pool-0123456789abcdef0"

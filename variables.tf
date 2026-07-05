@@ -44,6 +44,18 @@ variable "description" {
   default     = null
 }
 
+variable "enable_ram_sharing_with_organization" {
+  description = "Enable AWS RAM trusted access with AWS Organizations before creating RAM shares. Must be applied from the org management account only."
+  type        = bool
+  default     = false
+}
+
+variable "ram_sharing_enable_wait_duration" {
+  description = "How long to wait after enabling RAM sharing with AWS Organizations before creating RAM shares."
+  type        = string
+  default     = "90s"
+}
+
 variable "pools" {
   description = "Nested pool definitions. Max depth 5."
   type = map(object({

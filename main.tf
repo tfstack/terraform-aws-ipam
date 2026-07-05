@@ -94,6 +94,10 @@ locals {
     ? module.ipam_core[0].private_default_scope_id
     : module.ipam_core[0].public_default_scope_id
   ) : var.ipam_scope_id
+
+  has_ram_share_principals = anytrue([
+    for _, pool in local.flat_pools : length(coalesce(pool.ram_share_principals, [])) > 0
+  ])
 }
 
 module "ipam_core" {
@@ -105,6 +109,18 @@ module "ipam_core" {
   tags              = var.tags
 }
 
+resource "aws_ram_sharing_with_organization" "this" {
+  count = var.create && var.enable_ram_sharing_with_organization && local.has_ram_share_principals ? 1 : 0
+}
+
+resource "time_sleep" "wait_for_ram_org_sharing" {
+  count = length(aws_ram_sharing_with_organization.this)
+
+  create_duration = var.ram_sharing_enable_wait_duration
+
+  depends_on = [aws_ram_sharing_with_organization.this]
+}
+
 module "pool" {
   source = "./modules/pool"
   count  = var.create ? 1 : 0
@@ -114,5 +130,9 @@ module "pool" {
   flat_pools     = local.flat_pools
   tags           = var.tags
 
-  depends_on = [module.ipam_core]
+  depends_on = [
+    module.ipam_core,
+    aws_ram_sharing_with_organization.this,
+    time_sleep.wait_for_ram_org_sharing,
+  ]
 }
