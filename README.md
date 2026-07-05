@@ -127,20 +127,26 @@ RAM share names use the flat pool path with `/` replaced by `-` (for example, `c
 
 ## Examples
 
+### Basic — single account
+
 See [`examples/basic`](examples/basic/) for an end-to-end example that:
 
 1. Creates an IPAM with a `workload` pool
 2. Previews the next VPC CIDR with `aws_vpc_ipam_preview_next_cidr`
 3. Provisions a VPC and subnets using [`cloudbuildlab/vpc/aws`](https://registry.terraform.io/modules/cloudbuildlab/vpc/aws/latest)
 
-## Requirements
+### Multi-account — RAM sharing
 
-| Name | Version |
-| --- | --- |
-| [terraform](https://www.terraform.io/downloads.html) | >= 1.3 |
-| [aws](https://registry.terraform.io/providers/hashicorp/aws/latest) | >= 5.0 |
+See [`examples/multi-account`](examples/multi-account/) for a four-stack ANZ multi-region example that:
 
-Running `terraform test` with mock providers requires **Terraform >= 1.7**.
+1. Delegates IPAM admin to a network member account (`org-bootstrap/` in the management account)
+2. Creates IPAM with a three-level regional pool hierarchy in the network account (`ipam/`, home region ap-southeast-6)
+3. RAM-shares NZ and AU pools to dev (ap-southeast-6) and sandbox (ap-southeast-2) accounts
+4. Provisions a VPC and demo EC2 in each workload account
+
+Architecture rationale: [`.kiro/specs/multi-account-example/WALKTHROUGH.md`](.kiro/specs/multi-account-example/WALKTHROUGH.md)
+
+Stacks: `org-bootstrap/`, `ipam/`, `workload-a/`, `workload-b/` with pool IDs passed via `terraform.tfvars`.
 
 ## Testing
 
@@ -151,22 +157,18 @@ terraform test
 
 Tests in [`tests/ipam.tftest.hcl`](tests/ipam.tftest.hcl) use the Terraform test framework with a mock AWS provider. They validate module wiring and outputs without creating real infrastructure or requiring AWS credentials.
 
-## Inputs
+Running `terraform test` with mock providers requires **Terraform >= 1.7**.
 
-| Name | Description | Type | Default | Required |
-| --- | --- | --- | --- | --- |
-| `create` | Whether to create IPAM and pool resources | `bool` | `true` | no |
-| `create_ipam` | Whether to create a new IPAM instance. When `false`, set `ipam_scope_id` | `bool` | `true` | no |
-| `ipam_scope_id` | Existing IPAM scope ID when `create_ipam = false` | `string` | `null` | no |
-| `scope_type` | Scope to use when creating IPAM: `"private"` or `"public"` | `string` | `"private"` | no |
-| `address_family` | Address family applied to all pools | `string` | `"ipv4"` | no |
-| `description` | Description of the IPAM instance | `string` | `null` | no |
-| `pools` | Nested pool definitions (max depth 5). See [Pool hierarchy](#pool-hierarchy) | `map(object)` | `{}` | no |
-| `tags` | Tags applied to created resources | `map(string)` | `{}` | no |
+## Submodule documentation
 
-### `pools` object attributes
+Inputs and outputs for each submodule are defined in:
 
-Available at each level (L1 through L5 via nested `sub_pools`; L5 is the leaf level):
+- [`modules/ipam-core/variables.tf`](modules/ipam-core/variables.tf) / [`outputs.tf`](modules/ipam-core/outputs.tf)
+- [`modules/pool/variables.tf`](modules/pool/variables.tf) / [`outputs.tf`](modules/pool/outputs.tf)
+
+## Pool object attributes
+
+Available at each level of the `pools` map (L1 through L5 via nested `sub_pools`; L5 is the leaf level):
 
 | Attribute | Description | Required |
 | --- | --- | --- |
@@ -180,24 +182,6 @@ Available at each level (L1 through L5 via nested `sub_pools`; L5 is the leaf le
 | `auto_import` | Whether to auto-import discovered CIDRs | no |
 | `ram_share_principals` | Principal ARNs to share the pool with via RAM | no |
 | `sub_pools` | Child pools (not available at L5) | no |
-
-## Outputs
-
-| Name | Description |
-| --- | --- |
-| `ipam_id` | ID of the created IPAM instance (`null` when not created) |
-| `ipam_arn` | ARN of the created IPAM instance (`null` when not created) |
-| `private_scope_id` | Private default scope ID of the created IPAM (`null` when not created) |
-| `pools` | Map of pool attributes keyed by path (`id`, `arn`, `locale`, `cidr`, `source_ipam_pool_id`) |
-| `pool_ids` | Map of pool IDs keyed by path (convenience output) |
-| `ram_share_pool_keys` | Pool path keys that have RAM shares configured |
-
-## Submodule documentation
-
-Inputs and outputs for each submodule are defined in:
-
-- [`modules/ipam-core/variables.tf`](modules/ipam-core/variables.tf) / [`outputs.tf`](modules/ipam-core/outputs.tf)
-- [`modules/pool/variables.tf`](modules/pool/variables.tf) / [`outputs.tf`](modules/pool/outputs.tf)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
